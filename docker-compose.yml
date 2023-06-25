@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: crmdb
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+
+    ports:
+      - "3306:3306"
+
+    expose:
+      - 3306
+
+    volumes:
+      - /tmp/app/mysqld:/var/run/mysqld
+      - ./db:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./crm_backend
+      dockerfile: Dockerfile
+
+    restart: always
+    
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./crm_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
